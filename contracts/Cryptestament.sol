@@ -43,6 +43,9 @@ contract CryptestamentMainContract {
     mapping(address=>User) _userDetails;
     mapping(address => TestamentDetails) _userTestament;
     
+    /* Events */
+    event ClaimTaken(address payable[] nominees, uint256 amount);
+    
     
     constructor(address payable arbitrator, uint256 fixedCommission) public{
         _arbitrator = arbitrator;
@@ -60,7 +63,7 @@ contract CryptestamentMainContract {
         _userTestament[msg.sender] = testamentDetails;
     }
     
-    function ShowTestament() external returns (address payable[] memory,uint256,bool, uint256,uint256){
+    function ShowTestament() external view returns (address payable[] memory,uint256,bool, uint256,uint256){
         return (_userTestament[msg.sender].nominees,
         _userTestament[msg.sender].balanceToSend,
         _userTestament[msg.sender].canClaim,
@@ -71,40 +74,41 @@ contract CryptestamentMainContract {
     //TODO
     function UpdateUserDetails() external {}
     
-    //TODO
+    
     //Extend testament by daysToExtend
-    function RefreshTestament() external returns (bool){
+    function RefreshTestament() external{
         TestamentDetails storage testamentDetails = _userTestament[msg.sender]; 
         
-         if(CheckIfTimeRemains(testamentDetails.timeRemaining)){
+        require(CheckIfTimeRemains(testamentDetails.timeRemaining),"time has elapsed, or the claim has already been taken");
             
-            testamentDetails.timeRemaining += testamentDetails.daysToExtend * 1 days;
-            
-            return true;
-        }
-        return false;
+        testamentDetails.timeRemaining += testamentDetails.daysToExtend * 1 days;
+        
     }
     
-    //TODO
+    
     //First check if testament exists, then check if the user who is claming the testament exists in the nominees   
     function ClaimTestament(address testamentOwner) external payable {
         TestamentDetails memory testamentDetails = _userTestament[testamentOwner];
         
         require(CheckIfTimeRemains(testamentDetails.timeRemaining),"Claim time has not yet occured");
-        uint amount = testamentDetails.balanceToSend - 1000000; //Commission
-        //TODO
-       
+        uint amount = testamentDetails.balanceToSend - _fixedCommission; //Commission
+
         for(uint256 i=0; i < testamentDetails.nominees.length;i++){
             lock();
             uint sendAmount = amount / testamentDetails.nominees.length;
             testamentDetails.nominees[i].transfer(sendAmount);
             unlock();
         }
+        
+        lock();
+        _owner.transfer(_fixedCommission);
+        unlock();
+        
+        emit ClaimTaken(testamentDetails.nominees,amount);
        
     }
     
-    //TODO
-    function CheckClaimDate(address testamentOwner) external returns (uint year, uint month, uint day){
+    function CheckClaimDate(address testamentOwner) external view returns (uint year, uint month, uint day){
         TestamentDetails memory testamentDetails = _userTestament[testamentOwner];
         (year, month, day) = DateTimeLibrary.timestampToDate(testamentDetails.timeRemaining);
         return (year, month, day);
@@ -112,12 +116,13 @@ contract CryptestamentMainContract {
     
     
     /* Internal Functions */
-    function CheckIfTimeRemains(uint256 timeRemaining) internal returns (bool){
+    function CheckIfTimeRemains(uint256 timeRemaining) internal view returns (bool){
         if(now > timeRemaining)
             return true;
         return false;
     }
     
+    //TODO: Work on a complex version of lock function
     function lock() internal {
         if(!_locked){
             _locked = true;
@@ -126,6 +131,7 @@ contract CryptestamentMainContract {
         }
     }
     
+    //TODO: Work on a complex version of unlock function
     function unlock() internal  {
         _locked = true;
     }
