@@ -72,11 +72,20 @@ contract CryptestamentMainContract {
     }
     
     //TODO
-    function UpdateUserDetails() external {}
+    function UpdateUserDetails(string calldata firstName, string calldata lastName) external {
+        User memory user;
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.isPersonAlive = true;
+        
+        _userDetails[msg.sender] = user;
+    }
     
     
     //Extend testament by daysToExtend
     function RefreshTestament() external{
+        require(_userDetails[msg.sender].isPersonAlive,"Person does not exist or is not alive");
+        
         TestamentDetails storage testamentDetails = _userTestament[msg.sender]; 
         
         require(CheckIfTimeRemains(testamentDetails.timeRemaining),"time has elapsed, or the claim has already been taken");
@@ -91,6 +100,8 @@ contract CryptestamentMainContract {
         TestamentDetails memory testamentDetails = _userTestament[testamentOwner];
         
         require(CheckIfTimeRemains(testamentDetails.timeRemaining),"Claim time has not yet occured");
+        require(doesElementExistInArray(testamentDetails.nominees,msg.sender),"Unauthorized");
+        
         uint amount = testamentDetails.balanceToSend - _fixedCommission; //Commission
 
         for(uint256 i=0; i < testamentDetails.nominees.length;i++){
@@ -137,10 +148,19 @@ contract CryptestamentMainContract {
     }
     
     /* Public Functions */
-    function TimeChecker(uint256 timeRemaining) public returns (bool,uint){
+    function TimeChecker(uint256 timeRemaining) public view returns (bool,uint){
         if(now > timeRemaining)
             return (true, now);
         return (false, now);
+    }
+    
+    //Need to find a better way, probably through multisign (ecrecover)
+    function doesElementExistInArray (address payable[] memory nominees, address payable nominee) public pure returns (bool){
+      for (uint i; i< nominees.length;i++){
+          if (nominees[i]==nominee)
+          return true;
+      }
+      return false;
     }
     
 
