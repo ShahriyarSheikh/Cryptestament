@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Web3 from "web3";
 import './App.css';
+import {CRYPTESTAMENT_ABI,CRYPTESTAMENT_ADDRESS} from "./config.js";
 
 // function App() {
 //   return (
@@ -22,11 +23,16 @@ class App extends Component {
     const _account = await _web3.eth.getAccounts();
     console.log(_account)
     this.setState({ account: _account[0] })
+
+    const _cryptestmentObj = new _web3.eth.Contract(CRYPTESTAMENT_ABI,CRYPTESTAMENT_ADDRESS);
+    var _currentTime = await _cryptestmentObj.methods.TimeChecker(1576429552).call();
+    console.log(_currentTime[0])
+    this.setState({currentTime:_currentTime[0]})
   }
 
   constructor(props) {
     super(props)
-    this.state = { account: '' }
+    this.state = { account: 'a',currentTime:false }
   }
 
   render() {
@@ -34,6 +40,7 @@ class App extends Component {
       <div className="container">
         <h1>Hello</h1>
         <p>Your account: {this.state.account}</p>
+        <p>Current time: {this.state.currentTime}</p>
       </div>
     );
   }

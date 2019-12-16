@@ -1,5 +1,4 @@
 export const CRYPTESTAMENT_ADDRESS = "0xad2Aa2B658f083624bDd1d66778EEe7DCc2BE5f0"
-
 export const CRYPTESTAMENT_ABI =  [
 	{
 		"inputs": [

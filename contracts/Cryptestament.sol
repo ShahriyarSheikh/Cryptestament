@@ -58,6 +58,17 @@ contract Cryptestament {
         return (user.firstName, user.lastName, user.isPersonAlive);
     }
     
+        //TODO: move all data to IPFS rather than store on eth blockchain
+        // Have a signing mechanism that verifies the call to this function comes from our dedicated server
+    function UpdateUserDetails(string calldata firstName, string calldata lastName) external {
+        User memory user;
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.isPersonAlive = true;
+        
+        _userDetails[msg.sender] = user;
+    }
+    
     function AddTestament(address payable[] calldata nominees, uint256 timeRemaining, uint256 daysToExtend) external payable {
         TestamentDetails memory testamentDetails;
         testamentDetails.nominees = nominees;
@@ -73,16 +84,6 @@ contract Cryptestament {
         _userTestament[msg.sender].canClaim,
         _userTestament[msg.sender].daysToExtend,
         _userTestament[msg.sender].timeRemaining);
-    }
-    
-    //TODO
-    function UpdateUserDetails(string calldata firstName, string calldata lastName) external {
-        User memory user;
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.isPersonAlive = true;
-        
-        _userDetails[msg.sender] = user;
     }
     
     
@@ -104,7 +105,7 @@ contract Cryptestament {
         TestamentDetails memory testamentDetails = _userTestament[testamentOwner];
         
         require(CheckIfTimeRemains(testamentDetails.timeRemaining),"Claim time has not yet occured");
-        require(doesElementExistInArray(testamentDetails.nominees,msg.sender),"Unauthorized");
+        require(DoesNomineeExistInTestament(testamentDetails.nominees,msg.sender),"Unauthorized");
         
         uint amount = testamentDetails.balanceToSend - _fixedCommission; //Commission
 
@@ -150,6 +151,15 @@ contract Cryptestament {
     function unlock() internal  {
         _locked = true;
     }
+        
+    //TODO: Need to find a better way, probably through multisign (ecrecover)
+    function DoesNomineeExistInTestament (address payable[] memory nominees, address payable nominee) internal pure returns (bool){
+      for (uint i; i< nominees.length;i++){
+          if (nominees[i]==nominee)
+          return true;
+      }
+      return false;
+    }
     
     /* Public Functions */
     function TimeChecker(uint256 timeRemaining) public view returns (bool,uint){
@@ -157,15 +167,7 @@ contract Cryptestament {
             return (true, now);
         return (false, now);
     }
-    
-    //Need to find a better way, probably through multisign (ecrecover)
-    function doesElementExistInArray (address payable[] memory nominees, address payable nominee) public pure returns (bool){
-      for (uint i; i< nominees.length;i++){
-          if (nominees[i]==nominee)
-          return true;
-      }
-      return false;
-    }
+
     
 
 }
