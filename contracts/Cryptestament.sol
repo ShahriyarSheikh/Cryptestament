@@ -2,7 +2,7 @@ pragma solidity >=0.4.22 <0.6.0;
 
 import {DateTimeLibrary} from "./DateTimeLibrary.sol";
 
-contract CryptestamentMainContract {
+contract Cryptestament {
     
     /* Variables */
     address payable _arbitrator;
@@ -53,6 +53,10 @@ contract CryptestamentMainContract {
         _fixedCommission = fixedCommission;
     }
     
+    function CheckUserDetails(address userAddress) external view returns (string memory, string memory, bool){
+        User memory user = _userDetails[userAddress];
+        return (user.firstName, user.lastName, user.isPersonAlive);
+    }
     
     function AddTestament(address payable[] calldata nominees, uint256 timeRemaining, uint256 daysToExtend) external payable {
         TestamentDetails memory testamentDetails;
