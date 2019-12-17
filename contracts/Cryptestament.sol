@@ -149,7 +149,7 @@ contract Cryptestament {
     
     //TODO: Work on a complex version of unlock function
     function unlock() internal  {
-        _locked = true;
+        _locked = false;
     }
         
     //TODO: Need to find a better way, probably through multisign (ecrecover)

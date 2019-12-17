@@ -49,7 +49,63 @@ contract('Cryptestament', function (accounts) {
             //assert(testamentDetails.testamentAmount == testament[1],"Amount incorrect")
            
         })
+
+
         
 
     })
+
+    describe("DESCRIBE: Enter Testament and raise the days of nominee claim", function(){
+        it("add a testament by the owner", async () => {
+            var testamentDetails = {
+                nominees :["0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed","0xF45ED61919F0859D3FF5d8E2ECac7b59A94649e9"],
+                timeRemaining : getDate("12-12-2019"),
+                daysToExtend : 30,
+                testamentAmount: "2"
+            }
+ 
+            await demoContract.AddTestament(testamentDetails.nominees,
+             testamentDetails.timeRemaining,
+             testamentDetails.daysToExtend,
+             {value:web3.utils.toWei(testamentDetails.testamentAmount,"ether")})
+
+             assert(true);
+        })
+
+        it("extend claim to the days alloted in the testament",async () =>{
+            await demoContract.RefreshTestament();
+            var testament = await demoContract.ShowTestament();
+            var date =  getDate("12-12-2019");
+            
+            assert(testament[4].toNumber() >date,"Date not extended properly")
+        })
+    })
+
+    describe("DESCRIBE: As a nominee, try to claim the amount after days has passed",function(){
+        it("add a testament by the owner", async () => {
+            var testamentDetails = {
+                nominees :["0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed","0xF45ED61919F0859D3FF5d8E2ECac7b59A94649e9"],
+                timeRemaining : getDate("12-12-2019"),
+                daysToExtend : 30,
+                testamentAmount: "2"
+            }
+ 
+            await demoContract.AddTestament(testamentDetails.nominees,
+             testamentDetails.timeRemaining,
+             testamentDetails.daysToExtend,
+             {value:web3.utils.toWei(testamentDetails.testamentAmount,"ether")})
+
+             assert(true);
+        })
+
+        it("claim the testament by the nominee", async () => {
+            //console.log(web3)
+            var balanceOfNomineeB = await web3.Eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
+            await ClaimTestament("0x4A36D6E7F179e6B3e21C12278857fa5b69Ce7210",{from:"0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed"})
+            var balanceOfNomineeA = await web3.eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
+            assert(balanceOfNomineeB < balanceOfNomineeA,"Balance not received")
+            
+        })
+    })
+
 });
