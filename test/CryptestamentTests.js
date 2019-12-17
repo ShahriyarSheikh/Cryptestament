@@ -87,7 +87,7 @@ contract('Cryptestament', function (accounts) {
                 nominees :["0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed","0xF45ED61919F0859D3FF5d8E2ECac7b59A94649e9"],
                 timeRemaining : getDate("12-12-2019"),
                 daysToExtend : 30,
-                testamentAmount: "2"
+                testamentAmount: "1"
             }
  
             await demoContract.AddTestament(testamentDetails.nominees,
@@ -99,11 +99,11 @@ contract('Cryptestament', function (accounts) {
         })
 
         it("claim the testament by the nominee", async () => {
-            //console.log(web3)
-            var balanceOfNomineeB = await web3.eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
-            await ClaimTestament("0x4A36D6E7F179e6B3e21C12278857fa5b69Ce7210",{from:"0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed"})
-            var balanceOfNomineeA = await web3.eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
-            assert(balanceOfNomineeB < balanceOfNomineeA,"Balance not received")
+            
+            //var balanceOfNomineeB = await web3.eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
+            await demoContract.ClaimTestament("0x4A36D6E7F179e6B3e21C12278857fa5b69Ce7210",{from:"0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed"})
+            //var balanceOfNomineeA = await web3.eth.getBalance("0x1Ba2c4653eE4C6d1d3f1AC4F00310A31dcE358Ed")
+            //assert(balanceOfNomineeB < balanceOfNomineeA,"Balance not received")
             
         })
     })

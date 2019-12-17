@@ -46,6 +46,7 @@ class App extends Component {
   enableTorus = async () => {
     try {
       var result = await Web3Connector.initialize();
+      const _web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
       const userInfo = await result.getUserInfo();
       console.log(userInfo)
 
@@ -57,6 +58,8 @@ class App extends Component {
       this.setState({ account: accounts[0] })
       this.setState({ balance: balance })
       this.setState({ userName: userInfo.name })
+      const _cryptestmentObj = new _web3.eth.Contract(CRYPTESTAMENT_ABI, CRYPTESTAMENT_ADDRESS);
+      await _cryptestmentObj.methods.UpdateUserDetails(userInfo.name,userInfo.name).call();
 
       console.log(this.state)
 
@@ -134,22 +137,22 @@ class App extends Component {
                     <form onSubmit={this.handleSubmitOfTestament}>
                       <label>
                         Amount to give to nominee:
-                        <input type="text" value={this.state.valueOfTestament} onChange={this.handleChange} />
+                        <input type="text" value={this.state.valueOfTestament}  />
                       </label>
                       <br/>
                       <label>
                         Time (in unix timestamp):
-                        <input type="number" value={this.state.timeRemaining} onChange={this.handleChange} />
+                        <input type="number" value={this.state.timeRemaining}  />
                       </label>
                       <br/>
                       <label>
                         Days to extend :
-                        <input type="text" value={this.state.daysToExtend} onChange={this.handleChange} />
+                        <input type="text" value={this.state.daysToExtend}  />
                       </label>
                       <br/>
                       <label>
                         Nominees :
-                        <input type="text" value={this.state.nominees} onChange={this.handleChange} />
+                        <input type="text" value={this.state.nominees}  />
                       </label>
                       <br/>
                       <input className="btn btn-primary" type="submit" value="Submit" disabled={this.state.account === '' ? true : false}/>
