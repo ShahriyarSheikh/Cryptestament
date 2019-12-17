@@ -46,6 +46,9 @@ module.exports = {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
+     //network_id: "4", // Match any network id,
+     gas: 6700000, // Block Gas Limit same as latest on Mainnet https://ethstats.net/
+     gasPrice: 2000000000, // same as latest on Mainnet https://ethstats.net/
     },
 
     // Another network with more advanced options...

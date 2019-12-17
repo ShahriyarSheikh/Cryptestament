@@ -19,5 +19,7 @@
     "url": "https://github.com/ShahriyarSheikh/Cryptestament/issues"
   },
   "homepage": "https://github.com/ShahriyarSheikh/Cryptestament#readme",
-  "dependencies": {}
+  "dependencies": {
+    "web3": "^1.2.4"
+  }
 }
