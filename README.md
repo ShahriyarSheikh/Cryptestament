@@ -20,9 +20,9 @@ Web3.js v1.2.1
 ## Running the tests
 
 Running:
-truffle compile
-truffle migrate
-truffle test
+* truffle compile
+* truffle migrate
+* truffle test
 
 Also ganache must be running on the system
 
